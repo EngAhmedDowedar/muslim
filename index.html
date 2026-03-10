@@ -1484,6 +1484,8 @@ const ManaraApp = (function() {
             const nextAyah = state.currentAyahs.find(a => a.numberInSurah === nextLocal);
             if (!nextAyah) return;
             const url = API.audioCDN + '/' + state.reciter + '/' + nextAyah.number + '.mp3';
+            // Avoid reloading if same URL is already loaded
+            if (this.nextPlayer.src === url && this.preloadedNext) return;
             this.nextPlayer.src = url;
             this.nextPlayer.load();
             // Mark as preloaded when buffered enough
@@ -1494,9 +1496,10 @@ const ManaraApp = (function() {
                 // On error, still allow gapless attempt — active player's error handler handles retry
                 this.preloadedNext = true;
             }, { once: true });
-            // Also set after a short delay as fallback
-            setTimeout(() => {
-                if (this.nextPlayer.src) this.preloadedNext = true;
+            // Also set after a short delay as fallback (clear any previous timer first)
+            if (this._preloadTimer) clearTimeout(this._preloadTimer);
+            this._preloadTimer = setTimeout(() => {
+                if (this.nextPlayer.src === url) this.preloadedNext = true;
             }, 1500);
             // Preload 2nd ahead as well
             const nextLocal2 = nextLocal + 1;
@@ -2215,19 +2218,19 @@ const ManaraApp = (function() {
     /* ==================================================================
        🔔 ADHAN SYSTEM — Auto play at prayer times
     ================================================================== */
-    // Adhan audio CDN — replace with any valid adhan MP3 URL
+    // PLACEHOLDER: replace with a proper adhan MP3 URL (e.g., upload your own adhan.mp3 next to index.html)
+    // Example placeholder uses Surah Al-Fatiha from cdn.islamic.network — swap for actual adhan audio
     const ADHAN_AUDIO_URL = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3';
-    // NOTE for Capacitor: Replace with Capacitor's native audio plugin
+    // NOTE for Capacitor: Replace Web Audio API with @capacitor/local-notifications + native audio
 
     const adhanAudio = new Audio();
-    adhanAudio.preload = 'auto';
-    adhanAudio.src = ADHAN_AUDIO_URL;
+    adhanAudio.preload = 'none';
 
     var adhanState = {
         enabled: localStorage.getItem('adhanEnabled') !== 'false',
         scheduledTimers: [],
-        notifEnabled: localStorage.getItem('notifEnabled') === 'true' ||
-                      (typeof Notification !== 'undefined' && Notification.permission === 'granted'),
+        // Use Notification.permission as the source of truth at runtime
+        notifEnabled: (typeof Notification !== 'undefined' && Notification.permission === 'granted'),
     };
 
     function initAdhanSystem() {
@@ -2237,8 +2240,22 @@ const ManaraApp = (function() {
             localStorage.setItem('adhanEnabled', adhanState.enabled);
             updateAdhanBtn();
             showToast(adhanState.enabled ? 'تم تفعيل الأذان 🔔' : 'تم تعطيل الأذان 🔕');
-            if (adhanState.enabled && state.prayerTimes) scheduleAdhanTimers();
-            else cancelAdhanTimers();
+            if (adhanState.enabled && state.prayerTimes) {
+                // Request notification permission on first adhan enable (user-initiated)
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission().then(function(perm) {
+                        if (perm === 'granted') {
+                            adhanState.notifEnabled = true;
+                            showToast('تم تفعيل الإشعارات ✅');
+                        }
+                        scheduleAdhanTimers();
+                    });
+                } else {
+                    scheduleAdhanTimers();
+                }
+            } else {
+                cancelAdhanTimers();
+            }
         });
     }
 
@@ -2305,6 +2322,10 @@ const ManaraApp = (function() {
     function playAdhan(prayerName) {
         if (!adhanState.enabled) return;
         try {
+            if (!adhanAudio.src || adhanAudio.src === '' || adhanAudio.src === window.location.href) {
+                adhanAudio.src = ADHAN_AUDIO_URL;
+                adhanAudio.load();
+            }
             adhanAudio.currentTime = 0;
             var playP = adhanAudio.play();
             if (playP) playP.catch(function(e) {
@@ -2329,22 +2350,11 @@ const ManaraApp = (function() {
             });
         }
 
-        // Request notification permission on first run
-        if ('Notification' in window && Notification.permission === 'default') {
-            setTimeout(function() {
-                Notification.requestPermission().then(function(perm) {
-                    if (perm === 'granted') {
-                        adhanState.notifEnabled = true;
-                        localStorage.setItem('notifEnabled', 'true');
-                        showToast('تم تفعيل الإشعارات ✅');
-                        if (state.prayerTimes) scheduleAdhanTimers();
-                    }
-                });
-            }, 3000);
-        } else if ('Notification' in window && Notification.permission === 'granted') {
+        // Sync notification permission state (permission already granted)
+        if ('Notification' in window && Notification.permission === 'granted') {
             adhanState.notifEnabled = true;
-            localStorage.setItem('notifEnabled', 'true');
         }
+        // Permission is requested on first user-initiated adhan toggle (see initAdhanSystem)
     }
 
     function sendPrayerNotification(prayerName, suffix) {

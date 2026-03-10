@@ -51,7 +51,9 @@ self.addEventListener('fetch', function(event) {
 // Push event — handle incoming push messages
 self.addEventListener('push', function(event) {
     var data = {};
-    try { data = event.data ? event.data.json() : {}; } catch (e) {}
+    try { data = event.data ? event.data.json() : {}; } catch (e) {
+        console.warn('Push data parse error:', e);
+    }
 
     var title = data.title || 'منارة — تذكير الصلاة';
     var options = {
