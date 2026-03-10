@@ -1,0 +1,18 @@
+{
+  "name": "منارة الإسلامي",
+  "short_name": "منارة",
+  "description": "تطبيق إسلامي شامل — قرآن، صلاة، أذكار",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#04120c",
+  "theme_color": "#04120c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn.jsdelivr.net/npm/twemoji@14/2/svg/1f54c.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
