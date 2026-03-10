@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
 
     <style>
 /* ====================================================================
@@ -215,6 +216,12 @@ body {
     color: var(--gold);
     background: var(--gold-subtle);
 }
+
+/* ====================================================================
+   🔔 ADHAN & NOTIFICATIONS
+==================================================================== */
+.icon-btn.adhan-active { color: var(--gold); }
+.icon-btn.adhan-active i { text-shadow: 0 0 10px var(--gold-glow); }
 
 /* ====================================================================
    📄 MAIN CONTENT — FULL WIDTH
@@ -863,94 +870,6 @@ body {
 }
 
 /* ====================================================================
-   🧭 QIBLA
-==================================================================== */
-.qibla-section { text-align: center; padding: 15px 0; }
-.compass-container {
-    width: 220px;
-    height: 220px;
-    margin: 15px auto;
-    position: relative;
-}
-.compass-ring {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 2px solid var(--gold-border);
-    background: radial-gradient(circle, rgba(212,175,55,0.05), transparent);
-    position: relative;
-    transition: transform 0.15s ease-out;
-}
-.compass-directions {
-    position: absolute;
-    inset: 0;
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-.compass-directions span { position: absolute; color: var(--text-muted); }
-.compass-directions .dir-n { top: 8px; left: 50%; transform: translateX(-50%); color: var(--gold); }
-.compass-directions .dir-s { bottom: 8px; left: 50%; transform: translateX(-50%); }
-.compass-directions .dir-e { right: 8px; top: 50%; transform: translateY(-50%); }
-.compass-directions .dir-w { left: 8px; top: 50%; transform: translateY(-50%); }
-.qibla-needle {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 4px;
-    height: 80px;
-    background: linear-gradient(to top, transparent 0%, var(--gold) 100%);
-    transform-origin: bottom center;
-    transform: translate(-50%, -100%);
-    border-radius: 2px;
-    transition: transform 0.3s ease-out;
-}
-.qibla-needle::after {
-    content: '🕋';
-    position: absolute;
-    top: -22px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.1rem;
-}
-.compass-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 10px;
-    height: 10px;
-    background: var(--gold);
-    border-radius: 50%;
-    box-shadow: 0 0 15px var(--gold-glow);
-}
-.qibla-degrees {
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--gold);
-    margin-top: 12px;
-}
-.qibla-hint {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    margin-top: 10px;
-    padding: 12px 15px;
-    background: var(--gold-subtle);
-    border-radius: var(--border-radius-sm);
-    border: 1px solid var(--gold-border);
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    line-height: 1.5;
-    text-align: center;
-}
-.qibla-hint i { font-size: 1.1rem; flex-shrink: 0; }
-.qibla-hint.correct { border-color: var(--success); color: var(--success); background: rgba(46,204,113,0.1); }
-.qibla-hint.left-hint,
-.qibla-hint.right-hint { border-color: var(--warning); color: var(--warning); background: rgba(243,156,18,0.08); }
-
-/* ====================================================================
    🔘 BUTTONS
 ==================================================================== */
 .btn-gold-glow {
@@ -1106,14 +1025,12 @@ body {
     .prayer-countdown .countdown-timer { font-size: 1.4rem; }
     .tasbih-display { font-size: 2.8rem; }
     .tasbih-btn { width: 100px; height: 100px; font-size: 1.8rem; }
-    .compass-container { width: 180px; height: 180px; }
     .quick-grid { gap: 8px; }
     .zikr-text { font-size: 1rem; }
 }
 @media (min-width: 481px) {
-    .quick-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .quick-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .surah-list { grid-template-columns: repeat(2, 1fr); }
-    .compass-container { width: 260px; height: 260px; }
     .tasbih-btn { width: 140px; height: 140px; font-size: 2.5rem; }
     .tasbih-display { font-size: 4rem; }
     .azkar-cats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -1124,7 +1041,6 @@ body {
     .home-grid .home-full { grid-column: 1 / -1; }
     .prayers-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .surah-list { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .compass-container { width: 300px; height: 300px; }
     .tasbih-btn { width: 160px; height: 160px; font-size: 3rem; }
     .tasbih-display { font-size: 5rem; }
     .ayah-text { font-size: 1.5rem; line-height: 2.5; }
@@ -1173,6 +1089,9 @@ body {
         <span class="brand-name brand-ruqaa">مَنارَة</span>
     </div>
     <div class="header-actions">
+        <button class="icon-btn" id="adhanToggleBtn" title="تفعيل/تعطيل الأذان">
+            <i class="fa-solid fa-bell-slash"></i>
+        </button>
         <button class="icon-btn" id="refreshBtn" title="تحديث البيانات">
             <i class="fa-solid fa-rotate-right"></i>
         </button>
@@ -1197,7 +1116,7 @@ body {
             <!-- Location Permission Banner -->
             <div class="location-banner" id="locationBanner">
                 <div class="loc-icon"><i class="fa-solid fa-location-dot"></i></div>
-                <p>يحتاج التطبيق إلى إذن الوصول لموقعك الجغرافي لتحديد مواقيت الصلاة واتجاه القبلة بدقة</p>
+                <p>يحتاج التطبيق إلى إذن الوصول لموقعك الجغرافي لتحديد مواقيت الصلاة بدقة</p>
                 <button class="btn-gold-primary" id="requestLocationBtn">
                     <i class="fa-solid fa-location-crosshairs"></i>
                     السماح بتحديد الموقع
@@ -1253,11 +1172,6 @@ body {
                         <i class="fa-solid fa-circle-dot fa-2x gold-text mb-10"></i>
                         <h4 style="font-size:.95rem">السبحة</h4>
                         <span class="text-muted" style="font-size:.75rem">تسبيح إلكتروني</span>
-                    </div>
-                    <div class="app-card text-center shine-effect p-15" style="cursor:pointer" onclick="ManaraApp.navigateTo('qibla')">
-                        <i class="fa-solid fa-compass fa-2x gold-text mb-10"></i>
-                        <h4 style="font-size:.95rem">القبلة</h4>
-                        <span class="text-muted" style="font-size:.75rem">اتجاه القبلة</span>
                     </div>
                     <div class="app-card text-center shine-effect p-15" style="cursor:pointer" onclick="ManaraApp.navigateTo('quran')">
                         <i class="fa-solid fa-book-quran fa-2x gold-text mb-10"></i>
@@ -1368,38 +1282,6 @@ body {
         </div>
     </section>
 
-    <!-- ===================== QIBLA ===================== -->
-    <section class="page" id="qibla">
-        <div class="page-inner">
-            <h2 class="page-title brand-ruqaa gold-text text-center">🧭 اتجاه القبلة</h2>
-            <div class="app-card shine-effect" style="max-width:500px;margin:0 auto">
-                <div class="qibla-section">
-                    <div class="compass-container">
-                        <div class="compass-ring" id="compassRing">
-                            <div class="compass-directions">
-                                <span class="dir-n">N</span>
-                                <span class="dir-s">S</span>
-                                <span class="dir-e">E</span>
-                                <span class="dir-w">W</span>
-                            </div>
-                            <div class="qibla-needle" id="qiblaNeedle"></div>
-                            <div class="compass-center"></div>
-                        </div>
-                    </div>
-                    <div class="qibla-degrees" id="qiblaDegrees">---°</div>
-                    <div class="qibla-hint" id="qiblaHint">
-                        <i class="fa-solid fa-location-crosshairs"></i>
-                        <span>اضغط الزر لتحديد اتجاه القبلة</span>
-                    </div>
-                    <button class="btn-gold-glow mt-15 w-100" id="initQiblaBtn">
-                        <i class="fa-solid fa-location-crosshairs"></i>
-                        تحديد اتجاه القبلة
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
 </main>
 
 <!-- ====== AUDIO PLAYER BAR ====== -->
@@ -1425,7 +1307,6 @@ body {
     <button class="nav-item active" data-target="home"><i class="fa-solid fa-house"></i><span>الرئيسية</span></button>
     <button class="nav-item" data-target="quran"><i class="fa-solid fa-book-quran"></i><span>القرآن</span></button>
     <button class="nav-item" data-target="azkar"><i class="fa-solid fa-hands-praying"></i><span>الأذكار</span></button>
-    <button class="nav-item" data-target="qibla"><i class="fa-solid fa-compass"></i><span>القبلة</span></button>
 </nav>
 
 <!-- ====================================================================
@@ -1479,7 +1360,6 @@ const ManaraApp = (function() {
         location: { lat: null, lng: null, city: null, granted: false },
         reciter: localStorage.getItem('reciter') || 'ar.alafasy',
         tasbih: JSON.parse(localStorage.getItem('tasbih') || '{"count":0,"label":"سبحان الله"}'),
-        qibla: { angle: 0, active: false },
         countdownInterval: null,
     };
 
@@ -1538,9 +1418,27 @@ const ManaraApp = (function() {
 
             const handleError = (e) => {
                 console.warn('Audio error:', e.target.src);
-                this.playing = false;
-                this.updatePlayBtn();
-                showToast('تعذر تشغيل الصوت، جرّب قارئ آخر');
+                // Retry once after 1 second
+                const failedSrc = e.target.src;
+                if (failedSrc && !e.target._retried) {
+                    e.target._retried = true;
+                    setTimeout(() => {
+                        if (e.target.src === failedSrc) {
+                            e.target.load();
+                            if (e.target === this.activePlayer) {
+                                e.target.play().catch(() => {
+                                    this.playing = false;
+                                    this.updatePlayBtn();
+                                    showToast('تعذر تشغيل الصوت، جرّب قارئ آخر');
+                                });
+                            }
+                        }
+                    }, 1000);
+                } else {
+                    this.playing = false;
+                    this.updatePlayBtn();
+                    showToast('تعذر تشغيل الصوت، جرّب قارئ آخر');
+                }
             };
             this.playerA.addEventListener('error', handleError);
             this.playerB.addEventListener('error', handleError);
@@ -1586,9 +1484,35 @@ const ManaraApp = (function() {
             const nextAyah = state.currentAyahs.find(a => a.numberInSurah === nextLocal);
             if (!nextAyah) return;
             const url = API.audioCDN + '/' + state.reciter + '/' + nextAyah.number + '.mp3';
+            // Avoid reloading if same URL is already loaded
+            if (this.nextPlayer.src === url && this.preloadedNext) return;
             this.nextPlayer.src = url;
             this.nextPlayer.load();
-            this.preloadedNext = true;
+            // Mark as preloaded when buffered enough
+            this.nextPlayer.addEventListener('canplaythrough', () => {
+                this.preloadedNext = true;
+            }, { once: true });
+            this.nextPlayer.addEventListener('error', () => {
+                // On error, still allow gapless attempt — active player's error handler handles retry
+                this.preloadedNext = true;
+            }, { once: true });
+            // Also set after a short delay as fallback (clear any previous timer first)
+            if (this._preloadTimer) clearTimeout(this._preloadTimer);
+            this._preloadTimer = setTimeout(() => {
+                if (this.nextPlayer.src === url) this.preloadedNext = true;
+            }, 1500);
+            // Preload 2nd ahead as well
+            const nextLocal2 = nextLocal + 1;
+            if (nextLocal2 <= this.totalAyahs) {
+                const ayah2 = state.currentAyahs.find(a => a.numberInSurah === nextLocal2);
+                if (ayah2) {
+                    const url2 = API.audioCDN + '/' + state.reciter + '/' + ayah2.number + '.mp3';
+                    const preloader = new Audio();
+                    preloader.preload = 'auto';
+                    preloader.src = url2;
+                    preloader.load();
+                }
+            }
         },
 
         toggle: function() {
@@ -1689,7 +1613,8 @@ const ManaraApp = (function() {
         loadAzkarCategories();
         audioEngine.init();
         initAudioButtons();
-        initQiblaButton();
+        initAdhanSystem();
+        initNotifications();
     }
 
     /* ==================================================================
@@ -1903,6 +1828,7 @@ const ManaraApp = (function() {
                 state.prayerTimes = d.data.timings;
                 renderPrayerTimes();
                 startCountdown();
+                scheduleAdhanTimers();
             }
         } catch (e) {
             $('prayersList').innerHTML = '<div class="empty-state"><p>تعذر تحميل مواقيت الصلاة</p></div>';
@@ -2290,177 +2216,172 @@ const ManaraApp = (function() {
     }
 
     /* ==================================================================
-       🧭 QIBLA — Live Compass with Smart Hints
+       🔔 ADHAN SYSTEM — Auto play at prayer times
     ================================================================== */
-    function initQiblaButton() {
-        $('initQiblaBtn').addEventListener('click', initQibla);
-    }
+    // PLACEHOLDER: replace with a proper adhan MP3 URL (e.g., upload your own adhan.mp3 next to index.html)
+    // Example placeholder uses Surah Al-Fatiha from cdn.islamic.network — swap for actual adhan audio
+    const ADHAN_AUDIO_URL = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3';
+    // NOTE for Capacitor: Replace Web Audio API with @capacitor/local-notifications + native audio
 
-    function initQibla() {
-        var hint = $('qiblaHint');
-        var deg = $('qiblaDegrees');
-        var needle = $('qiblaNeedle');
-        var ring = $('compassRing');
+    const adhanAudio = new Audio();
+    adhanAudio.preload = 'none';
 
-        hint.className = 'qibla-hint';
-        hint.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>جاري تحديد الموقع الجغرافي...</span>';
+    var adhanState = {
+        enabled: localStorage.getItem('adhanEnabled') !== 'false',
+        scheduledTimers: [],
+        // Use Notification.permission as the source of truth at runtime
+        notifEnabled: (typeof Notification !== 'undefined' && Notification.permission === 'granted'),
+    };
 
-        if (!navigator.geolocation) {
-            hint.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>المتصفح لا يدعم تحديد الموقع الجغرافي</span>';
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            function(pos) {
-                var lat = pos.coords.latitude;
-                var lng = pos.coords.longitude;
-
-                // Calculate Qibla angle using spherical formula
-                var kLat = 21.4225 * Math.PI / 180;
-                var kLng = 39.8262 * Math.PI / 180;
-                var uLat = lat * Math.PI / 180;
-                var uLng = lng * Math.PI / 180;
-
-                var qAngle = Math.atan2(
-                    Math.sin(kLng - uLng),
-                    Math.cos(uLat) * Math.tan(kLat) - Math.sin(uLat) * Math.cos(kLng - uLng)
-                ) * 180 / Math.PI;
-
-                var qibla = ((qAngle % 360) + 360) % 360;
-                state.qibla.angle = qibla;
-                deg.textContent = Math.round(qibla) + '°';
-
-                // Try live compass
-                var hasOrientation = window.DeviceOrientationEvent;
-
-                if (hasOrientation && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    // iOS 13+ — must explicitly request permission
-                    DeviceOrientationEvent.requestPermission().then(function(response) {
-                        if (response === 'granted') {
-                            startLiveCompass(qibla, needle, ring, hint);
-                        } else {
-                            showStaticQibla(qibla, needle, hint);
+    function initAdhanSystem() {
+        updateAdhanBtn();
+        $('adhanToggleBtn').addEventListener('click', function() {
+            adhanState.enabled = !adhanState.enabled;
+            localStorage.setItem('adhanEnabled', adhanState.enabled);
+            updateAdhanBtn();
+            showToast(adhanState.enabled ? 'تم تفعيل الأذان 🔔' : 'تم تعطيل الأذان 🔕');
+            if (adhanState.enabled && state.prayerTimes) {
+                // Request notification permission on first adhan enable (user-initiated)
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission().then(function(perm) {
+                        if (perm === 'granted') {
+                            adhanState.notifEnabled = true;
+                            showToast('تم تفعيل الإشعارات ✅');
                         }
-                    }).catch(function() {
-                        showStaticQibla(qibla, needle, hint);
+                        scheduleAdhanTimers();
                     });
-                } else if (hasOrientation) {
-                    startLiveCompass(qibla, needle, ring, hint);
                 } else {
-                    showStaticQibla(qibla, needle, hint);
+                    scheduleAdhanTimers();
                 }
-
-                showToast('تم تحديد اتجاه القبلة بنجاح');
-            },
-            function(err) {
-                if (err.code === 1) {
-                    hint.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>يرجى السماح بالوصول للموقع الجغرافي من إعدادات المتصفح</span>';
-                } else {
-                    hint.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>تعذر تحديد الموقع، تأكد من تفعيل GPS</span>';
-                }
-            },
-            { enableHighAccuracy: true, timeout: 15000 }
-        );
+            } else {
+                cancelAdhanTimers();
+            }
+        });
     }
 
-    function startLiveCompass(qibla, needle, ring, hint) {
-        state.qibla.active = true;
-        var smoothHeading = 0;
-        var hasReceivedData = false;
-
-        hint.innerHTML = '<i class="fa-solid fa-sync fa-spin"></i><span>جاري معايرة البوصلة...</span>';
-
-        function handleOrientation(e) {
-            if (!state.qibla.active) return;
-            if (e.alpha === null) {
-                if (!hasReceivedData) {
-                    showStaticQibla(qibla, needle, hint);
-                }
-                return;
-            }
-            hasReceivedData = true;
-
-            var heading = e.webkitCompassHeading || (360 - e.alpha);
-            // Smooth the heading to avoid jitter
-            var diff = heading - smoothHeading;
-            if (diff > 180) diff -= 360;
-            if (diff < -180) diff += 360;
-            smoothHeading = (smoothHeading + diff * 0.12 + 360) % 360;
-
-            // Rotate compass ring opposite to heading
-            ring.style.transform = 'rotate(' + (-smoothHeading) + 'deg)';
-            // Needle always points to qibla direction
-            needle.style.transform = 'translate(-50%, -100%) rotate(' + qibla + 'deg)';
-
-            // Calculate angular difference for hints
-            var angleDiff = qibla - smoothHeading;
-            if (angleDiff > 180) angleDiff -= 360;
-            if (angleDiff < -180) angleDiff += 360;
-
-            updateQiblaHint(angleDiff, hint);
-        }
-
-        window.addEventListener('deviceorientation', handleOrientation, true);
-    }
-
-    function updateQiblaHint(angleDiff, el) {
-        var absDiff = Math.abs(angleDiff);
-        var icon, text, cls;
-
-        if (absDiff <= 5) {
-            icon = 'fa-solid fa-check-circle';
-            text = 'أنت في الاتجاه الصحيح للقبلة، ثبّت على هذا الوضع';
-            cls = 'qibla-hint correct';
-        } else if (absDiff <= 15) {
-            if (angleDiff > 0) {
-                icon = 'fa-solid fa-arrow-left';
-                text = 'أد�� هاتفك لليسار قليلاً، أنت قريب جداً';
-                cls = 'qibla-hint left-hint';
-            } else {
-                icon = 'fa-solid fa-arrow-right';
-                text = 'أدر هاتفك لليمين قليلاً، أنت قريب جداً';
-                cls = 'qibla-hint right-hint';
-            }
-        } else if (absDiff <= 45) {
-            if (angleDiff > 0) {
-                icon = 'fa-solid fa-arrow-left';
-                text = 'أدر هاتفك لليسار';
-                cls = 'qibla-hint left-hint';
-            } else {
-                icon = 'fa-solid fa-arrow-right';
-                text = 'أدر هاتفك لليمين';
-                cls = 'qibla-hint right-hint';
-            }
-        } else if (absDiff <= 90) {
-            if (angleDiff > 0) {
-                icon = 'fa-solid fa-angles-left';
-                text = 'أدر هاتفك لليسار بشكل أكبر';
-                cls = 'qibla-hint left-hint';
-            } else {
-                icon = 'fa-solid fa-angles-right';
-                text = 'أدر هاتفك لليمين بشكل أكبر';
-                cls = 'qibla-hint right-hint';
-            }
+    function updateAdhanBtn() {
+        var btn = $('adhanToggleBtn');
+        if (!btn) return;
+        var icon = btn.querySelector('i');
+        if (adhanState.enabled) {
+            btn.classList.add('adhan-active');
+            icon.className = 'fa-solid fa-bell';
+            btn.title = 'تعطيل الأذان';
         } else {
-            if (angleDiff > 0) {
-                icon = 'fa-solid fa-rotate-left';
-                text = 'استدر لليسار حتى تصل لاتجاه القبلة';
-                cls = 'qibla-hint left-hint';
-            } else {
-                icon = 'fa-solid fa-rotate-right';
-                text = 'استدر لليمين حتى تصل لاتجاه القبلة';
-                cls = 'qibla-hint right-hint';
-            }
+            btn.classList.remove('adhan-active');
+            icon.className = 'fa-solid fa-bell-slash';
+            btn.title = 'تفعيل الأذان';
         }
-
-        el.className = cls;
-        el.innerHTML = '<i class="' + icon + '"></i><span>' + text + '</span>';
     }
 
-    function showStaticQibla(qibla, needle, hint) {
-        needle.style.transform = 'translate(-50%, -100%) rotate(' + qibla + 'deg)';
-        hint.className = 'qibla-hint';
-        hint.innerHTML = '<i class="fa-solid fa-info-circle"></i><span>اتجاه القبلة ' + Math.round(qibla) + '° من الشمال. افتح التطبيق من الهاتف لتفعيل البوصلة الحيّة</span>';
+    function scheduleAdhanTimers() {
+        cancelAdhanTimers();
+        if (!state.prayerTimes || !adhanState.enabled) return;
+
+        var prayerKeys = [
+            { k: 'Fajr',    n: 'الفجر' },
+            { k: 'Dhuhr',   n: 'الظهر' },
+            { k: 'Asr',     n: 'العصر' },
+            { k: 'Maghrib', n: 'المغرب' },
+            { k: 'Isha',    n: 'العشاء' }
+        ];
+
+        var now = new Date();
+        prayerKeys.forEach(function(p) {
+            if (!state.prayerTimes[p.k]) return;
+            var parts = state.prayerTimes[p.k].split(':');
+            var pTime = new Date();
+            pTime.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+
+            var diff = pTime - now;
+            if (diff > 0 && diff < 86400000) {
+                // Schedule adhan at exact prayer time
+                var t = setTimeout(function(pName) {
+                    playAdhan(pName);
+                    sendPrayerNotification(pName, '');
+                }.bind(null, p.n), diff);
+                adhanState.scheduledTimers.push(t);
+
+                // Schedule notification 5 min before
+                var diffNotif = diff - 5 * 60 * 1000;
+                if (diffNotif > 0 && adhanState.notifEnabled) {
+                    var tn = setTimeout(function(pName) {
+                        sendPrayerNotification(pName, ' (بعد 5 دقائق)');
+                    }.bind(null, p.n), diffNotif);
+                    adhanState.scheduledTimers.push(tn);
+                }
+            }
+        });
+    }
+
+    function cancelAdhanTimers() {
+        adhanState.scheduledTimers.forEach(function(t) { clearTimeout(t); });
+        adhanState.scheduledTimers = [];
+    }
+
+    function playAdhan(prayerName) {
+        if (!adhanState.enabled) return;
+        try {
+            if (!adhanAudio.src || adhanAudio.src === '' || adhanAudio.src === window.location.href) {
+                adhanAudio.src = ADHAN_AUDIO_URL;
+                adhanAudio.load();
+            }
+            adhanAudio.currentTime = 0;
+            var playP = adhanAudio.play();
+            if (playP) playP.catch(function(e) {
+                console.warn('Adhan autoplay blocked:', e.message);
+            });
+            showToast('حان وقت صلاة ' + prayerName + ' 🕌');
+        } catch (e) {
+            console.warn('Adhan play error:', e);
+        }
+    }
+
+    /* ==================================================================
+       🔔 NOTIFICATIONS SYSTEM
+    ================================================================== */
+    function initNotifications() {
+        // Register service worker for background notifications
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(function(reg) {
+                console.log('SW registered:', reg.scope);
+            }).catch(function(e) {
+                console.warn('SW registration failed:', e);
+            });
+        }
+
+        // Sync notification permission state (permission already granted)
+        if ('Notification' in window && Notification.permission === 'granted') {
+            adhanState.notifEnabled = true;
+        }
+        // Permission is requested on first user-initiated adhan toggle (see initAdhanSystem)
+    }
+
+    function sendPrayerNotification(prayerName, suffix) {
+        if (!adhanState.notifEnabled) return;
+        if (!('Notification' in window)) return;
+        if (Notification.permission !== 'granted') return;
+
+        var title = 'منارة — حان وقت صلاة ' + prayerName + suffix;
+        var opts = {
+            body: 'حان الآن وقت صلاة ' + prayerName + '، تذكر الصلاة في وقتها 🕌',
+            icon: 'https://cdn.jsdelivr.net/npm/twemoji@14/2/svg/1f54c.svg',
+            badge: 'https://cdn.jsdelivr.net/npm/twemoji@14/2/svg/1f54c.svg',
+            tag: 'prayer-' + prayerName,
+            renotify: true,
+            requireInteraction: false
+        };
+
+        // Use service worker notification if available for background support
+        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.ready.then(function(reg) {
+                reg.showNotification(title, opts);
+            }).catch(function() {
+                new Notification(title, opts);
+            });
+        } else {
+            try { new Notification(title, opts); } catch (e) {}
+        }
     }
 
     /* ==================================================================
